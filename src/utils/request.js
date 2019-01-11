@@ -4,7 +4,9 @@ const Boom = require('boom');
 
 const constants = require('../constants');
 const errors = require('../constants/error');
+const codes = require('../constants/code');
 const encrypt = require('./encrypt');
+const logger = require('./logger');
 
 const generateUserAgent = (userAgent) => {
   const userAgents = [
@@ -44,36 +46,38 @@ const generateUserAgent = (userAgent) => {
   return userAgents[index];
 };
 
-// method 为 POST 时，Content-Type 为 application/x-www-form-urlencoded
-axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 axios.interceptors.request.use((config) => {
   const headers = {
     'User-Agent': generateUserAgent(config.userAgent)
   };
-
-  if (config.url.includes(constants.MusicApiDomain)) {
-    headers['Referer'] = constants.MusicApiHost;
-  }
-
-  if (config.cookies) {
-    let cookie;
-    if (typeof config.cookies === 'object') {
-      cookie = Object.keys(config.cookies).map(
-        (key) => `${encodeURIComponent(key)}=${encodeURIComponent(config.cookies[key])}`
-      ).join('; ');
-    } else {
-      cookie = config.cookies;
-    }
-
-    headers['Cookie'] = cookie;
-    delete config.cookies;
-  }
+  delete config.userAgent;
 
   const { url } = config;
   if (!/^https?:?\/\//.test(url)) {
     config.url = `${constants.MusicApiHost}${url}`;
   }
 
+  if (config.url.includes(constants.MusicApiDomain)) {
+    headers['Referer'] = constants.MusicApiHost;
+  }
+
+  if (config.method.toUpperCase() === 'POST') {
+    headers['Content-Type'] = 'application/x-www-form-urlencoded';
+  }
+
+  if (config.cookie) {
+    let cookie;
+    if (typeof config.cookie === 'object') {
+      cookie = Object.keys(config.cookie).map(
+        (key) => `${encodeURIComponent(key)}=${encodeURIComponent(config.cookie[key])}`
+      ).join('; ');
+    } else {
+      cookie = config.cookie;
+    }
+
+    headers['Cookie'] = cookie;
+    delete config.cookie;
+  }
   if (config.crypto === 'linux') {
     config.data = config.data || {};
     config.data = encrypt.linux({
@@ -83,7 +87,7 @@ axios.interceptors.request.use((config) => {
     });
     headers['User-Agent'] =
       'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36';
-    config.url = 'https://music.163.com/api/linux/forward';
+    config.url = `${constants.MusicApiHost}/api/linux/forward`;
     delete config.crypto;
   } else if (config.crypto === 'we') {
     const csrfToken = (headers['Cookie'] || '').match(/_csrf=([^(;|$)]+)/);
@@ -103,6 +107,8 @@ axios.interceptors.request.use((config) => {
   return config;
 }, (error) => Promise.reject(error));
 axios.interceptors.response.use((response) => {
+  // 记录日志
+  logger.apiInfo(response);
   const result = {};
   result.cookie = (response.headers['set-cookie'] || []).map(
     (x) => x.replace(/\s*Domain=[^(;|$)]+;*/, '')
@@ -111,18 +117,19 @@ axios.interceptors.response.use((response) => {
   result.data = response.data;
 
   result.status = response.data.code || response.status;
-  result.status = result.status > 100 && result.status < 600 ? result.status : errors.Codes.InternalServer;
+  result.status = result.status > 100 && result.status < 600 ? result.status : codes.InternalServer;
 
-  if (result.status === 200) {
+  if (result.status === codes.Success) {
     return Promise.resolve(result);
   }
-
   throw new Boom(new Error(response.data.msg || errors.Messages.InternalServer), {
-    statusCode: result.status
+    statusCode: 1000 + parseInt(result.status, 10)
   });
 }, (err) => {
+  // 记录日志
+  logger.apiInfo(err);
   throw new Boom(err, {
-    statusCode: errors.Codes.InternalServer
+    statusCode: 1000 + codes.InternalServer
   });
 });
 
@@ -131,7 +138,7 @@ module.exports = {
     return axios({
       method: 'post',
       url,
-      data: data,
+      data,
       ...options
     });
   },
@@ -139,7 +146,7 @@ module.exports = {
     return axios({
       method: 'put',
       url,
-      data: data,
+      data,
       ...options
     });
   },

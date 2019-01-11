@@ -1,10 +1,9 @@
 module.exports = {
   Messages: {
+    MovedPermanently: 'Moved Permanently',
     BadRequest: 'Invalid Params',
+    Unauthorized: 'Unauthorized',
+    NotFound: 'Not Found',
     InternalServer: 'Internal Server Error'
-  },
-  Codes: {
-    BadRequest: 400,
-    InternalServer: 500
   }
 };

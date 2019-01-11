@@ -12,7 +12,6 @@
   "dependencies": {
     "axios": "0.18.0",
     "boom": "7.3.0",
-    "crypto": "1.0.1",
     "debug": "4.1.1",
     "koa": "2.2.0",
     "koa-bodyparser": "3.2.0",
