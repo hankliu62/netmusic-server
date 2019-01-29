@@ -33,6 +33,23 @@ router.get('/multi-match', async(ctx) => {
   ctx.body = result;
 });
 
+// 云盘搜索
+router.get('/cloud', async(ctx) => {
+  const keywords = ctx.request.query.keywords;
+
+  if (!keywords) {
+    throw Boom.badRequest(errors.Messages.BadRequest, 'The params keywords is required');
+  }
+
+  const result = await search.cloud(
+    ctx.request.query.type,
+    keywords,
+    cookies.parser(ctx.request)
+  );
+
+  ctx.body = result;
+});
+
 // 搜索建议
 router.get('/suggest', async(ctx) => {
   const keywords = ctx.request.query.keywords;

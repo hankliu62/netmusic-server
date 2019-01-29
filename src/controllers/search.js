@@ -29,7 +29,7 @@ async function fetchHotList(cookie) {
  *  - 1002: 用户
  *  - 1004: MV
  *  - 1006: 歌词
- *  - 1009: 电台
+ *  - 1009: 主播电台
  *  - 1014: 视频
  * @param {string} [keywords=''] 关键字
  * @param {object} cookie
@@ -42,6 +42,36 @@ async function multiMatch(type = 1, keywords = '', cookie) {
   };
 
   const url = '/weapi/search/suggest/multimatch';
+
+  const options = { crypto: 'we', cookie };
+
+  return await request.post(url, data, options);
+}
+
+/**
+ * 云盘搜索
+ *
+ * @param {number} [type=1] 搜索的类型
+ *  - 1: 单曲
+ *  - 10: 专辑
+ *  - 100: 歌手
+ *  - 1000: 歌单
+ *  - 1002: 用户
+ *  - 1004: MV
+ *  - 1006: 歌词
+ *  - 1009: 主播电台
+ *  - 1014: 视频
+ * @param {string} [keywords=''] 关键字
+ * @param {object} cookie
+ * @returns
+ */
+async function cloud(type = 1, keywords = '', cookie) {
+  const data = {
+    type: type,
+    s: keywords
+  };
+
+  const url = '/weapi/cloudsearch/get/web';
 
   const options = { crypto: 'we', cookie };
 
@@ -105,5 +135,6 @@ module.exports = {
   fetchHotList,
   multiMatch,
   fetchSuggest,
-  fetchList
+  fetchList,
+  cloud
 };
