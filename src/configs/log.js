@@ -30,7 +30,8 @@ module.exports = {
     {
       'rule-console': {'type': 'console'},
       'errorLogger': {
-        'type': 'dateFile',
+        // 'type': 'dateFile',
+        'type': 'console',
         'filename': errorLogPath,
         'pattern': '-yyyy-MM-dd.log',
         'alwaysIncludePattern': true,
@@ -40,7 +41,8 @@ module.exports = {
         'path': errorPath
       },
       'apiLogger': {
-        'type': 'dateFile',
+        // 'type': 'dateFile',
+        'type': 'console',
         'filename': apiLogPath,
         'pattern': '-yyyy-MM-dd.log',
         'alwaysIncludePattern': true,
@@ -50,7 +52,8 @@ module.exports = {
         'path': apiPath
       },
       'resLogger': {
-        'type': 'dateFile',
+        // 'type': 'dateFile',
+        'type': 'console',
         'filename': responseLogPath,
         'pattern': '-yyyy-MM-dd.log',
         'alwaysIncludePattern': true,

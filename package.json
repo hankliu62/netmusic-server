@@ -22,7 +22,8 @@
     "koa-router": "7.1.1",
     "koa-static": "3.0.0",
     "koa2-cors": "2.0.6",
-    "log4js": "3.0.6"
+    "log4js": "3.0.6",
+    "pm2": "3.2.9"
   },
   "devDependencies": {
     "@commitlint/cli": "7.2.1",

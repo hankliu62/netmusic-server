@@ -1,0 +1,16 @@
+version: '2'
+
+services:
+  netmusic-server:
+    container_name: netmusic-server
+    build: .
+    working_dir: /home/Workspace/netmusic-server
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - PM2_PUBLIC_KEY=ua0rqru25ca2pl3
+      - PM2_SECRET_KEY=5uv3olow4eukxeu
+    command: /bin/sh -c 'pm2-runtime start pm2.json'
+    privileged: true
+    ports:
+      - '3000:3000'
