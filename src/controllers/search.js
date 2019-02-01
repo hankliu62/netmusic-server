@@ -62,13 +62,17 @@ async function multiMatch(type = 1, keywords = '', cookie) {
  *  - 1009: 主播电台
  *  - 1014: 视频
  * @param {string} [keywords=''] 关键字
+ * @param {number} [pageIndex=1]
+ * @param {number} [pageSize=20]
  * @param {object} cookie
  * @returns
  */
-async function cloud(type = 1, keywords = '', cookie) {
+async function cloud(type = 1, keywords = '', pageIndex = 1, pageSize = 20, cookie) {
   const data = {
     type: type,
-    s: keywords
+    s: keywords,
+    offset: (pageIndex || 1) - 1,
+    limit: pageSize
   };
 
   const url = '/weapi/cloudsearch/get/web';
@@ -108,7 +112,7 @@ async function fetchSuggest(keywords = '', cookie) {
  *  - 1002: 用户
  *  - 1004: MV
  *  - 1006: 歌词
- *  - 1009: 电台
+ *  - 1009: 主播电台
  *  - 1014: 视频
  * @param {string} [keywords=''] 关键字
  * @param {number} [pageIndex=1]

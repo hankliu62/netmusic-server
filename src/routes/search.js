@@ -44,6 +44,8 @@ router.get('/cloud', async(ctx) => {
   const result = await search.cloud(
     ctx.request.query.type,
     keywords,
+    ctx.request.query['pagination.pageIndex'],
+    ctx.request.query['pagination.pageSize'],
     cookies.parser(ctx.request)
   );
 
